@@ -15,6 +15,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.OpenApi.Models;
+using Improbability.Models;
 
 namespace Improbability
 {
@@ -34,7 +35,7 @@ namespace Improbability
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));
             services.AddDatabaseDeveloperPageExceptionFilter();
-            services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+            services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
                 .AddEntityFrameworkStores<ApplicationDbContext>();
             services.AddRazorPages();
             services.AddControllers();
@@ -45,7 +46,7 @@ namespace Improbability
                 {
                     Title = "Improbability API",
                     Version = "v1",
-                    Description = "lirum larum Loeffelstiel",
+                    Description = "An API to get, add and manage random number generators with the associated generated values.",
                     Contact = new OpenApiContact
                     {
                         Name = "Philipp Weiermann",
