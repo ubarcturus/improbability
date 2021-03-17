@@ -8,7 +8,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Improbability.Controller.v1
 {
-    [Route("api/[controller]")]
+    /// <summary>
+    /// A web API that can manage random items stored in a database.
+    /// </summary>
+    [Produces("application/json")]
+    [Route("api/v1/[controller]")]
     [ApiController]
     public class RandomItemsController : ControllerBase
     {
