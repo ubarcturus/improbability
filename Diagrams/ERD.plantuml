@@ -1,0 +1,99 @@
+@startuml ERD
+hide circle
+skinparam shadowing false
+
+entity "RandomItems" as items {
+  * **Id : int <<PK>>**
+  --
+  Name : nvarchar(MAX) <<NOT NULL>>
+  NumberOfPossibleResults : int <<NOT NULL>>
+  Description : nvarchar(MAX)
+  * ApplicationUserId : nvarchar(450) <<FK, NOT NULL>>
+}
+
+entity "RandomEvents" as events {
+  * **Id : int <<PK>>**
+  --
+  Name : nvarchar(MAX)
+  Time: nvarchar(MAX) <<NOT NULL>>
+  Result : int <<NOT NULL>>
+  Description : nvarchar(MAX)
+  * RandomItemId : int <<FK, NOT NULL>>
+}
+
+entity "AspNetUsers" as user {
+  * **Id : nvarchar(450) <<PK>>**
+  --
+  Discriminator : nvarchar(MAX) <<NOT NULL>>
+  ApiKey : nvarchar(MAX)
+  UserName : nvarchar(256)
+  NormalizedUserName : nvarchar(256)
+  Email : nvarchar(256)
+  NormalizedEmail : nvarchar(256)
+  EmailConfirmed : bit <<NOT NULL>>
+  PasswordHash : nvarchar(MAX)
+  SecurityStamp : nvarchar(MAX)
+  ConcurrencyStamp : nvarchar(MAX)
+  PhoneNumber : nvarchar(MAX)
+  PhoneNumberConfirmed : bit <<NOT NULL>>
+  TwoFactorEnabled : bit <<NOT NULL>>
+  LockoutEnd : datetimeoffset(7)
+  LockoutEnabled : bit <<NOT NULL>>
+  AccessFailedCount : int <<NOT NULL>>
+}
+
+entity "AspNetUserClaims" as claims {
+    * **Id : int <<PK>>**
+    --
+    * UserId : nvarchar(450) <<FK, NOT NULL>>
+    ClaimType : nvarchar(MAX)
+    ClaimValue : nvarchar(MAX)
+}
+
+entity "AspNetUserLogins" as logins {
+    * **LoginProvider : nvarchar(128) <<PK>>**
+    * **ProviderKey : nvarchar(128) <<PK>>**
+    --
+    ProviderDisplayName : nvarchar(MAX)
+    * UserId : nvarchar(450) <<FK, NOT NULL>>
+}
+
+entity "AspNetUserTokens" as tokens {
+    * **UserId : nvarchar(450) <<PK, FK>>**
+    * **LoginProvider : nvarchar(128) <<PK>>**
+    * **Name : nvarchar(128) <<PK>>**
+    --
+    Value : nvarchar(MAX)
+}
+
+entity "AspNetUserRoles" as userRoles {
+    * **UserId : nvarchar(450) <<PK, FK>>**
+    * **RoleId : nvarchar(450) <<PK, FK>>**
+    --
+}
+
+entity "AspNetRoles" as roles {
+    * **Id : nvarchar(450) <<PK>>**
+    --
+    Name : nvarchar(256)
+    NormalizedName : nvarchar(256)
+    ConcurrencyStamp: nvarchar(MAX)
+}
+
+entity "AspNetRoleClaims" as roleClaims {
+    * **Id : int <<PK>>**
+    --
+    * RoleId : nvarchar(450) <<FK, NOT NULL>>
+    ClaimType : nvarchar(MAX)
+    ClaimValue : nvarchar(MAX)
+}
+
+items::Id "1" .right. "mc" events::RandomItemId
+user::Id "1 " .up. "mc" items::ApplicationUserId
+user::Id "1" ... "  mc" claims::UserId
+user::Id " " .. "mc" logins::UserId
+user::Id "1" .right. "mc" tokens::UserId
+user::Id "1 " .left. "mc" userRoles::UserId
+roles::Id "  1" .up. "mc" userRoles::RoleId
+roles::Id "  1" .. "  mc" roleClaims::RoleId
+@enduml

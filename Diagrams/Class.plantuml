@@ -1,0 +1,62 @@
+@startuml Class Diagram
+left to right direction
+skinparam shadowing false
+
+package Models <<rectangle>> {
+    class ApplicationUser {
+        + ApiKey : string <<get>> <<set>>
+        + RandomItems : Collection<RandomItem> <<get>>
+    }
+
+    class RandomEvent {
+        + Id : int <<get>> <<set>>
+        + Name : string <<get>> <<set>>
+        + Time : string <<get>> <<set>>
+        + Result : int <<get>> <<set>>
+        + Description : string <<get>> <<set>>
+        + RandomItemId : int <<get>> <<set>>
+    }
+
+    class RandomItem {
+        + Id : int <<get>> <<set>>
+        + Name : string <<get>> <<set>>
+        + NumberOfPossibleResults : int <<get>> <<set>>
+        + Description : string <<get>> <<set>>
+    }
+}
+
+package Pages <<rectangle>> {
+    class RandomItemDiagramsModel {
+        + RandomItemDiagramsModel(context:ApplicationDbContext)
+        + <<async>> OnGetAsync() : Task<PageResult>
+        + <<async>> OnPostRandomEventsAsync(requestBody:RequestBody) : Task<IActionResult>
+    }
+    class RequestBody {
+        + ApiKey : string <<get>> <<set>>
+        + RandomItemId : int <<get>> <<set>>
+    }
+    
+    class AddRandomEventModel {
+        + AddRandomEventModel(context:ApplicationDbContext)
+        + OnGet() : IActionResult
+        + <<async>> OnPostAsync() : Task<IActionResult>
+    }
+
+    class ApiKeyModel {
+        + ApiKeyModel(userManager:UserManager<ApplicationUser>)
+        + ApiKey : string <<get>> <<set>>
+        + StatusMessage : string <<get>> <<set>>
+        + <<async>> OnGetAsync() : Task<IActionResult>
+        + <<async>> OnPostAsync() : Task<IActionResult>
+    }
+}
+
+ApplicationUser "1" -left- "0..*   " RandomItem
+ApplicationUser -left-|> IdentityUser
+RandomItemDiagramsModel -up-> RandomEvent
+RandomItemDiagramsModel -up-> ApplicationUser
+RandomItemDiagramsModel *-right- RequestBody
+AddRandomEventModel --> RandomEvent
+AddRandomEventModel --> ApplicationUser
+
+@enduml

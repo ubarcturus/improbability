@@ -1,0 +1,56 @@
+@startuml UseCase
+left to right direction
+skinparam shadowing false
+
+frame "use case Improbability" {
+  actor "Benutzer" as user
+  rectangle "Applikation" as app <<actor>>
+
+  node Browser {
+    usecase "Zufallsereignis\n erfassen" as usrpoe <<website>>
+    usecase "Zufallsereignisse grafisch\n darstellen lassen" as usrgeaeo <<website>>
+  }
+
+  rectangle API {
+    component Zufallsgenerator <<controller>> {
+      usecase "Zufallsgeneratoren abrufen" as geo
+      usecase "Einen Zufallsgenerator ändern" as puo
+      usecase "Einen oder mehrere meiner Zufallsgeneratoren\n per JSON oder CSV hinzufügen" as poo
+      usecase "Einen meiner Zufallsgeneratoren löschen" as deo
+      usecase "API-Key prüfen" as keyo
+    }
+
+    component Zufallsereignisse <<controller>> {
+      usecase "Zufallsereigisse abrufen" as geae
+      usecase "Alle Zufallsereignisse von einem\n meiner Zufallsgeneratoren abrufen" as geaeo
+      usecase "Ein Zufallsereigniss ändern" as pue
+      usecase "Ein oder mehrere Zufallsereignisse\n per JSON oder CSV hinzufügen" as poe
+      usecase "Eines meiner Zufallsereignisse löschen" as dee
+      usecase "API-Key prüfen" as keye
+    }
+  }
+
+  user -- usrpoe
+  user -- usrgeaeo
+  usrpoe -- poe
+  usrgeaeo -- geaeo
+  app -- geo
+  app -- puo
+  app -- poo
+  app -- deo
+  app -- geae
+  app -- geaeo
+  app -- pue
+  app -- poe
+  app -- dee
+  geo ..> keyo : <<include>>
+  puo ..> keyo : <<include>>
+  poo ..> keyo : <<include>>
+  deo ..> keyo : <<include>>
+  geae ..> keye : <<include>>
+  geaeo ..> keye : <<include>>
+  pue ..> keye : <<include>>
+  poe ..> keye : <<include>>
+  dee ..> keye : <<include>>
+}
+@enduml
