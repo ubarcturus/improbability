@@ -17,7 +17,8 @@ namespace Improbability.Data
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
-            // Because this function is an "override", the functions of the superclass must be called explicitly,
+            // Because this function is an "override",
+            // the functions of the superclass must be called explicitly,
             // otherwise they will not be executed and errors will result.
             base.OnModelCreating(builder);
 

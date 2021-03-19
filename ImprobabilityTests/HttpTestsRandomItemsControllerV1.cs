@@ -1,8 +1,10 @@
 using System;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
+using System.Text.Json;
 using Xunit;
 
 namespace ImprobabilityTests
@@ -151,5 +153,52 @@ namespace ImprobabilityTests
         }
 
         #endregion PUT
+
+        #region POST
+
+        [Fact]
+        public void AddOneItem()
+        {
+            const string item = "{\"name\":\"W10\",\"numberOfPossibleResults\":10,\"description\":\" Zehn POST Seiten\"}";
+            var (httpStatusCode, _) = HttpPost(KeyUbarcturus, item);
+            Assert.Equal(HttpStatusCode.Created, httpStatusCode);
+        }
+
+        [Fact]
+        public void AddManyItems()
+        {
+            const string w6 = "{\"name\":\"W6\",\"numberOfPossibleResults\":6,\"description\":\"Sechs POST Seiten\"}";
+            const string w10 = "{\"name\":\"W10\",\"numberOfPossibleResults\":10,\"description\":\"Zehn POST Seiten\"}";
+            const string w20 = "{\"name\":\"W20\",\"numberOfPossibleResults\":20,\"description\":\"Zwanzig POST Seiten\"}";
+            var items = $"[{w6},{w10},{w20}]";
+            var (httpStatusCode, _) = HttpPost(KeyUbarcturus, items);
+            Assert.Equal(HttpStatusCode.Created, httpStatusCode);
+        }
+
+        #endregion POST
+
+        #region DELETE
+
+        [Fact]
+        public void DeleteItem()
+        {
+            var (_, body) = HttpGet("", KeyUbarcturus);
+            var itemId = JsonSerializer.Deserialize<JsonDocument>(body)
+                ?.RootElement.EnumerateArray()
+                .Last()
+                .GetProperty("id")
+                .ToString();
+            var (httpStatusCode, _) = HttpDelete(itemId, KeyUbarcturus);
+            Assert.Equal(HttpStatusCode.NoContent, httpStatusCode);
+        }
+
+        [Fact]
+        public void DeleteItemWithIdWhichNotExists()
+        {
+            var (httpStatusCode, _) = HttpDelete("2147483647", KeyUbarcturus);
+            Assert.Equal(HttpStatusCode.NotFound, httpStatusCode);
+        }
+
+        #endregion DELETE
     }
 }
