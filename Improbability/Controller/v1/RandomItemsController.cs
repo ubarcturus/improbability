@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Improbability.Data;
 using Improbability.Models;
@@ -100,9 +102,78 @@ namespace Improbability.Controller.v1
             return NoContent();
         }
 
+        /// <summary>
+        ///     Checks if the user is authorized.
+        /// </summary>
+        /// <param name="authorization">The value from authorization key in the header.</param>
+        /// <returns>true, if the validation is successful, otherwise false.</returns>
+        private bool IsAuthorized(string authorization)
+        {
+            return UserIsAuthenticated(authorization, out _);
+        }
+
+        /// <summary>
+        ///     Checks if the user is authorized for the id.
+        /// </summary>
+        /// <param name="id">The id from the randomItem</param>
+        /// <param name="authorization">The value from authorization key in the header.</param>
+        /// <returns>true, if the validation is successful, otherwise false.</returns>
+        private bool IsAuthorized(string authorization, int id)
+        {
+            if (!UserIsAuthenticated(authorization, out var applicationUser))
+            {
+                return false;
+            }
+
+            if (applicationUser.RandomItems.Any(r => r.Id == id) || !_context.RandomItems.Any(r => r.Id == id))
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        private async Task<Collection<RandomItem>> GetRandomItemsFromUserAsync(string authorization)
+        {
+            var apiKey = AuthenticationHeaderValue.Parse(authorization).Parameter;
+            return (await _context.ApplicationUsers.Include(a => a.RandomItems)
+                .FirstAsync(a => a.ApiKey == apiKey)).RandomItems;
+        }
+
         private bool RandomItemExists(int id)
         {
-            return _context.RandomItems.Any(e => e.Id == id);
+            return _context.RandomItems.Any(r => r.Id == id);
         }
+
+        /// <summary>
+        /// Checks if the authorization value in the header is valid, if the api-key is assigned to a user.
+        /// </summary>
+        /// <param name="authorization">The value from authorization key in the header.</param>
+        /// <param name="applicationUser">The ApplicationUser or null.</param>
+        /// <returns>true, if the validation is successful, otherwise false.</returns>
+        private bool UserIsAuthenticated(string authorization, out ApplicationUser applicationUser)
+        {
+            applicationUser = null;
+
+            if (!AuthenticationHeaderValue.TryParse(authorization, out var authenticationHeaderValue))
+            {
+                return false;
+            }
+
+            applicationUser = _context.ApplicationUsers.Include(a => a.RandomItems).AsNoTracking()
+                .FirstOrDefault(a => a.ApiKey == authenticationHeaderValue.Parameter);
+
+            if (applicationUser == null)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        // private bool RandomItemExists(int id)
+        // {
+        //     return _context.RandomItems.Any(e => e.Id == id);
+        // }
     }
 }
