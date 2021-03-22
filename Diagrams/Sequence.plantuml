@@ -1,0 +1,11 @@
+@startuml Sequence
+
+Benutzer -> Browser: Klick: Show Diagram
+Browser -> Browser: Read inputs
+Browser -> API: fetch GET URL
+API -> RandomItem: GetRandomEvents(...)
+RandomItem -> Database: SELECT * FROM RandomEvents ...
+
+Browser -> Browser: Draw Diagram
+
+@enduml

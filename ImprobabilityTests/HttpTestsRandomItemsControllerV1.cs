@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -16,46 +17,54 @@ namespace ImprobabilityTests
         private const string KeyUbarcturus = "5RE23H4JHQA2DVLVSEZ525UCRLWXUKGQ";
         private const string KeyPhilipp = "ZTVWQSDYXSF2UB6B46LKSIGA7GVWHZAQ";
 
-        private static (HttpStatusCode httpStatusCode, string reponseContent) HttpGet(string itemId, string key)
+        private static (HttpStatusCode httpStatusCode, string responseContent) HttpGet(string itemId, string key)
         {
             var requestUri = new Uri($"{Root}{itemId}");
-            using var httpClient = new HttpClient();
-            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Key", key);
+            using var httpClient = new HttpClient { DefaultRequestHeaders = { Authorization = new AuthenticationHeaderValue("Key", key) } };
             var response = httpClient.GetAsync(requestUri).Result;
-            var reponseContent = response.Content.ReadAsStringAsync().Result;
-            return (response.StatusCode, reponseContent);
+            var responseContent = response.Content.ReadAsStringAsync().Result;
+            return (response.StatusCode, responseContent);
         }
 
-        private static (HttpStatusCode httpStatusCode, string reponseContent) HttpPut(string itemId, string key, string item)
+        private static (HttpStatusCode httpStatusCode, string responseContent) HttpPut(string itemId, string key, string item)
         {
             var requestUri = new Uri($"{Root}{itemId}");
-            using var httpClient = new HttpClient();
+            using var httpClient = new HttpClient { DefaultRequestHeaders = { Authorization = new AuthenticationHeaderValue("Key", key) } };
             using var requestContent = new StringContent(item, Encoding.UTF8, "application/json");
-            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Key", key);
             var response = httpClient.PutAsync(requestUri, requestContent).Result;
-            var reponseContent = response.Content.ReadAsStringAsync().Result;
-            return (response.StatusCode, reponseContent);
+            var responseContent = response.Content.ReadAsStringAsync().Result;
+            return (response.StatusCode, responseContent);
         }
 
-        private static (HttpStatusCode httpStatusCode, string reponseContent) HttpPost(string key, string items)
+        private static (HttpStatusCode httpStatusCode, string responseContent) HttpPost(string key, string items)
         {
             var requestUri = new Uri($"{Root}");
-            using var httpClient = new HttpClient();
+            using var httpClient = new HttpClient { DefaultRequestHeaders = { Authorization = new AuthenticationHeaderValue("Key", key) } };
             using var requestContent = new StringContent(items, Encoding.UTF8, "application/json");
-            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Key", key);
             var response = httpClient.PostAsync(requestUri, requestContent).Result;
-            var reponseContent = response.Content.ReadAsStringAsync().Result;
-            return (response.StatusCode, reponseContent);
+            var responseContent = response.Content.ReadAsStringAsync().Result;
+            return (response.StatusCode, responseContent);
         }
 
-        private static (HttpStatusCode httpStatusCode, string reponseContent) HttpDelete(string itemId, string key)
+        private static (HttpStatusCode httpStatusCode, string responseContent) HttpPostCsv(string key, string name, string fileName, string data)
+        {
+            var requestUri = new Uri($"{Root}csv");
+            using var httpClient = new HttpClient { DefaultRequestHeaders = { Authorization = new AuthenticationHeaderValue("Key", key) } };
+            using var streamContent = new StreamContent(new MemoryStream(Encoding.UTF8.GetBytes(data)));
+            const string boundary = "AnythingThatIsNotWithinData";
+            using var requestContent = new MultipartFormDataContent(boundary) { { streamContent, name, fileName } };
+            var response = httpClient.PostAsync(requestUri, requestContent).Result;
+            var responseContent = response.Content.ReadAsStringAsync().Result;
+            return (response.StatusCode, responseContent);
+        }
+
+        private static (HttpStatusCode httpStatusCode, string responseContent) HttpDelete(string itemId, string key)
         {
             var requestUri = new Uri($"{Root}{itemId}");
-            using var httpClient = new HttpClient();
-            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Key", key);
+            using var httpClient = new HttpClient { DefaultRequestHeaders = { Authorization = new AuthenticationHeaderValue("Key", key) } };
             var response = httpClient.DeleteAsync(requestUri).Result;
-            var reponseContent = response.Content.ReadAsStringAsync().Result;
-            return (response.StatusCode, reponseContent);
+            var responseContent = response.Content.ReadAsStringAsync().Result;
+            return (response.StatusCode, responseContent);
         }
 
         [Fact]
@@ -159,7 +168,7 @@ namespace ImprobabilityTests
         [Fact]
         public void AddOneItem()
         {
-            const string item = "{\"name\":\"W10\",\"numberOfPossibleResults\":10,\"description\":\" Zehn POST Seiten\"}";
+            const string item = "[{\"name\":\"W10\",\"numberOfPossibleResults\":10,\"description\":\"Zehn POST Seiten\"}]";
             var (httpStatusCode, _) = HttpPost(KeyUbarcturus, item);
             Assert.Equal(HttpStatusCode.Created, httpStatusCode);
         }
@@ -173,6 +182,56 @@ namespace ImprobabilityTests
             var items = $"[{w6},{w10},{w20}]";
             var (httpStatusCode, _) = HttpPost(KeyUbarcturus, items);
             Assert.Equal(HttpStatusCode.Created, httpStatusCode);
+        }
+
+        [Fact]
+        public void AddEmptyItemArray()
+        {
+            const string item = "[]";
+            var (httpStatusCode, _) = HttpPost(KeyUbarcturus, item);
+            Assert.Equal(HttpStatusCode.BadRequest, httpStatusCode);
+        }
+
+        [Fact]
+        public void AddEmptyItem()
+        {
+            const string item = "";
+            var (httpStatusCode, _) = HttpPost(KeyUbarcturus, item);
+            Assert.Equal(HttpStatusCode.BadRequest, httpStatusCode);
+        }
+
+        [Fact]
+        public void AddItemsFromCsv()
+        {
+            const string w30 = "W30,30,30 CSV Seiten";
+            const string w8 = "W8,8";
+            const string w12 = "W12,12,";
+            const string w2 = "W2,2,\"Zwei, CSV Seiten\"";
+            const string name = "csv";
+            const string fileName = "test.csv";
+            var data = $"{w30}\n{w8}\n{w12}\n{w2}";
+            var (httpStatusCode, _) = HttpPostCsv(KeyUbarcturus, name, fileName, data);
+            Assert.Equal(HttpStatusCode.Created, httpStatusCode);
+        }
+
+        [Fact]
+        public void AddEmptyCsv()
+        {
+            const string name = "csv";
+            const string fileName = "test.csv";
+            const string data = "";
+            var (httpStatusCode, _) = HttpPostCsv(KeyUbarcturus, name, fileName, data);
+            Assert.Equal(HttpStatusCode.BadRequest, httpStatusCode);
+        }
+
+        [Fact]
+        public void AddNotConformCsv()
+        {
+            const string name = "csv";
+            const string fileName = "test.csv";
+            const string data = "NotConform";
+            var (httpStatusCode, _) = HttpPostCsv(KeyUbarcturus, name, fileName, data);
+            Assert.Equal(HttpStatusCode.BadRequest, httpStatusCode);
         }
 
         #endregion POST

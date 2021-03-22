@@ -1,4 +1,5 @@
-﻿using Improbability.Models;
+﻿using System.Diagnostics;
+using Improbability.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,6 +10,11 @@ namespace Improbability.Data
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
+        }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            optionsBuilder.LogTo(message => Debug.WriteLine(message));
         }
 
         public DbSet<RandomItem> RandomItems { get; set; }

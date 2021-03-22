@@ -1,17 +1,23 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
+using CsvHelper;
+using CsvHelper.Configuration;
+using CsvHelper.TypeConversion;
 using Improbability.Data;
 using Improbability.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace Improbability.Controller.v1
 {
     /// <summary>
-    /// A web API that can manage random items stored in a database.
+    ///     A web API that can manage random items stored in a database.
     /// </summary>
     [Produces("application/json")]
     [Route("api/v1/[controller]")]
@@ -25,33 +31,39 @@ namespace Improbability.Controller.v1
             _context = context;
         }
 
-        // GET: api/RandomItems
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<RandomItem>>> GetRandomItems()
+        public async Task<ActionResult<IEnumerable<RandomItem>>> GetRandomItems([FromHeader] string authorization)
         {
-            return await _context.RandomItems.ToListAsync();
-        }
-
-        // GET: api/RandomItems/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<RandomItem>> GetRandomItem(int id)
-        {
-            var randomItem = await _context.RandomItems.FindAsync(id);
-
-            if (randomItem == null)
+            if (!IsAuthorized(authorization))
             {
-                return NotFound();
+                return Unauthorized();
             }
 
-            return randomItem;
+            return await GetRandomItemsFromUserAsync(authorization);
         }
 
-        // PUT: api/RandomItems/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutRandomItem(int id, RandomItem randomItem)
+        [HttpGet("{id}")]
+        public async Task<ActionResult<RandomItem>> GetRandomItem(int id, [FromHeader] string authorization)
         {
-            if (id != randomItem.Id)
+            if (!IsAuthorized(authorization, id))
+            {
+                return Unauthorized();
+            }
+
+            var randomItem = await _context.RandomItems.FindAsync(id);
+
+            return randomItem ?? (ActionResult<RandomItem>)NotFound();
+        }
+
+        [HttpPut("{id}")]
+        public async Task<ActionResult<RandomItem>> PutRandomItem(int id, [FromHeader] string authorization, RandomItem randomItem)
+        {
+            if (!IsAuthorized(authorization, id))
+            {
+                return Unauthorized();
+            }
+
+            if (randomItem == null || id != randomItem.Id)
             {
                 return BadRequest();
             }
@@ -72,18 +84,84 @@ namespace Improbability.Controller.v1
                 throw;
             }
 
-            return NoContent();
+            return Ok(randomItem);
         }
 
-        // POST: api/RandomItems
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<RandomItem>> PostRandomItem(RandomItem randomItem)
+        public async Task<ActionResult<Collection<RandomItem>>> PostRandomItems([FromHeader] string authorization, Collection<RandomItem> randomItems)
         {
-            _context.RandomItems.Add(randomItem);
+            if (!IsAuthorized(authorization))
+            {
+                return Unauthorized();
+            }
+
+            if (randomItems == null || randomItems.Count == 0)
+            {
+                return BadRequest();
+            }
+
+            var randomItemsFromUser = await GetRandomItemsFromUserAsync(authorization);
+            foreach (var randomItem in randomItems)
+            {
+                randomItemsFromUser.Add(randomItem);
+            }
+
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetRandomItem", new { id = randomItem.Id }, randomItem);
+            return CreatedAtAction(nameof(GetRandomItems), randomItems);
+        }
+
+        [HttpPost("csv")]
+        [Consumes("multipart/form-data")]
+        public async Task<ActionResult<Collection<RandomItem>>> PostRandomItems([FromHeader] string authorization, IFormFile csv)
+        {
+            if (!IsAuthorized(authorization))
+            {
+                return Unauthorized();
+            }
+
+            if (csv == null || csv.Length == 0)
+            {
+                return BadRequest();
+            }
+
+            StreamReader streamReader = null;
+            if (false)
+            {
+                streamReader = new StreamReader(csv.OpenReadStream());
+            }
+
+            var memoryStream = new MemoryStream();
+            await csv.CopyToAsync(memoryStream);
+            memoryStream.Position = 0;
+            streamReader = new StreamReader(memoryStream);
+
+            var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+            {
+                HasHeaderRecord = false,
+                MissingFieldFound = null
+            };
+            using var csvReader = new CsvReader(streamReader, config);
+
+            var randomItems = new List<RandomItem>();
+            try
+            {
+                randomItems = csvReader.GetRecords<RandomItem>().ToList();
+            }
+            catch (TypeConverterException)
+            {
+                return BadRequest();
+            }
+
+            var randomItemsFromUser = await GetRandomItemsFromUserAsync(authorization);
+            foreach (var randomItem in randomItems)
+            {
+                randomItemsFromUser.Add(randomItem);
+            }
+
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction(nameof(GetRandomItems), randomItems);
         }
 
         // DELETE: api/RandomItems/5
@@ -146,7 +224,7 @@ namespace Improbability.Controller.v1
         }
 
         /// <summary>
-        /// Checks if the authorization value in the header is valid, if the api-key is assigned to a user.
+        ///     Checks if the authorization value in the header is valid and if the api-key is assigned to a user.
         /// </summary>
         /// <param name="authorization">The value from authorization key in the header.</param>
         /// <param name="applicationUser">The ApplicationUser or null.</param>
@@ -170,10 +248,5 @@ namespace Improbability.Controller.v1
 
             return true;
         }
-
-        // private bool RandomItemExists(int id)
-        // {
-        //     return _context.RandomItems.Any(e => e.Id == id);
-        // }
     }
 }
