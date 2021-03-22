@@ -63,7 +63,7 @@ namespace Improbability
                         Type = SecuritySchemeType.ApiKey,
                         In = ParameterLocation.Header,
                         Name = "Authorization",
-                        Description = "Please enter your API-Key. Example: `Key 5BLBAI3PGNUPVO5GFKMUSSPC6KCAE2M7`"
+                        Description = "Please enter your API-Key. Example: `Key 5RE23H4JHQA2DVLVSEZ525UCRLWXUKGQ`"
                     });
                 c.AddSecurityRequirement(new OpenApiSecurityRequirement
                 {

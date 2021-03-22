@@ -31,7 +31,17 @@ namespace Improbability.Controller.v1
             _context = context;
         }
 
+        /// <summary>
+        /// Get all RandomItems
+        /// </summary>
+        /// <param name="authorization" example="Key 5RE23H4JHQA2DVLVSEZ525UCRLWXUKGQ">Your API-Key</param>
+        /// <returns>All RandomItems.</returns>
+        /// <response code="200">Return a JSON-Array of RandomItems</response>
+        /// <response code="401">Unauthorized: Your API-Key is wrong or in wrong format</response>
         [HttpGet]
+        [ProducesResponseType(typeof(Collection<RandomItem>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesDefaultResponseType]
         public async Task<ActionResult<IEnumerable<RandomItem>>> GetRandomItems([FromHeader] string authorization)
         {
             if (!IsAuthorized(authorization))
@@ -42,7 +52,20 @@ namespace Improbability.Controller.v1
             return await GetRandomItemsFromUserAsync(authorization);
         }
 
+        /// <summary>
+        /// Get a RandomItem by ID.
+        /// </summary>
+        /// <param name="id">The ID of the desired RandomItem</param>
+        /// <param name="authorization" example="Key 5RE23H4JHQA2DVLVSEZ525UCRLWXUKGQ">Your API-Key</param>
+        /// <returns>The RandomItem with the id</returns>
+        /// <response code="200">Return the RandomItem with this id</response>
+        /// <response code="401">Unauthorized: Your API-Key is wrong or in wrong format, or you have no permissions for the RandomItem with this id</response>
+        /// <response code="404">Not Found: There is no RandomItem with this id</response>
         [HttpGet("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesDefaultResponseType]
         public async Task<ActionResult<RandomItem>> GetRandomItem(int id, [FromHeader] string authorization)
         {
             if (!IsAuthorized(authorization, id))
@@ -56,6 +79,11 @@ namespace Improbability.Controller.v1
         }
 
         [HttpPut("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesDefaultResponseType]
         public async Task<ActionResult<RandomItem>> PutRandomItem(int id, [FromHeader] string authorization, RandomItem randomItem)
         {
             if (!IsAuthorized(authorization, id))
