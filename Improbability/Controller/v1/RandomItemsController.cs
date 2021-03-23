@@ -154,10 +154,6 @@ namespace Improbability.Controller.v1
             }
 
             StreamReader streamReader = null;
-            if (false)
-            {
-                streamReader = new StreamReader(csv.OpenReadStream());
-            }
 
             var memoryStream = new MemoryStream();
             await csv.CopyToAsync(memoryStream);
@@ -192,11 +188,16 @@ namespace Improbability.Controller.v1
             return CreatedAtAction(nameof(GetRandomItems), randomItems);
         }
 
-        // DELETE: api/RandomItems/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteRandomItem(int id)
+        public async Task<IActionResult> DeleteRandomItem(int id, [FromHeader] string authorization)
         {
+            if (!IsAuthorized(authorization, id))
+            {
+                return Unauthorized();
+            }
+
             var randomItem = await _context.RandomItems.FindAsync(id);
+
             if (randomItem == null)
             {
                 return NotFound();
