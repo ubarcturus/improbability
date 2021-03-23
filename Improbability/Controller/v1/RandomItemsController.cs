@@ -239,18 +239,6 @@ namespace Improbability.Controller.v1
             return false;
         }
 
-        private async Task<Collection<RandomItem>> GetRandomItemsFromUserAsync(string authorization)
-        {
-            var apiKey = AuthenticationHeaderValue.Parse(authorization).Parameter;
-            return (await _context.ApplicationUsers.Include(a => a.RandomItems)
-                .FirstAsync(a => a.ApiKey == apiKey)).RandomItems;
-        }
-
-        private bool RandomItemExists(int id)
-        {
-            return _context.RandomItems.Any(r => r.Id == id);
-        }
-
         /// <summary>
         ///     Checks if the authorization value in the header is valid and if the api-key is assigned to a user.
         /// </summary>
@@ -275,6 +263,18 @@ namespace Improbability.Controller.v1
             }
 
             return true;
+        }
+
+        private async Task<Collection<RandomItem>> GetRandomItemsFromUserAsync(string authorization)
+        {
+            var apiKey = AuthenticationHeaderValue.Parse(authorization).Parameter;
+            return (await _context.ApplicationUsers.Include(a => a.RandomItems)
+                .FirstAsync(a => a.ApiKey == apiKey)).RandomItems;
+        }
+
+        private bool RandomItemExists(int id)
+        {
+            return _context.RandomItems.Any(r => r.Id == id);
         }
     }
 }
