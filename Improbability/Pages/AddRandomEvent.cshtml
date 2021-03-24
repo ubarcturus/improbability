@@ -1,0 +1,67 @@
+﻿@page
+@model Improbability.Pages.AddRandomEventModel
+
+@{
+    ViewData["Title"] = "Add RandomEvent";
+}
+
+<h1>Add RandomEvent</h1>
+
+<h4>RandomEvent</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        @if (Response.StatusCode == 201)
+        {
+            <div class="alert alert-success text-center" role="alert">
+                Successful added: <br/>
+                @(Model.RandomEvent)
+            </div>
+        }
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="ApplicationUser.ApiKey" class="control-label"></label>
+                <input asp-for="ApplicationUser.ApiKey" class="form-control" value="5RE23H4JHQA2DVLVSEZ525UCRLWXUKGQ"/>
+                <span asp-validation-for="ApplicationUser.ApiKey" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="RandomEvent.Name" class="control-label"></label>
+                <input asp-for="RandomEvent.Name" class="form-control" />
+                <span asp-validation-for="RandomEvent.Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="RandomEvent.Time" class="control-label"></label>
+                <input asp-for="RandomEvent.Time" class="form-control" type="datetime-local" value="@(DateTime.Now.ToString("s"))" />
+                <span asp-validation-for="RandomEvent.Time" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="RandomEvent.Result" class="control-label"></label>
+                <input asp-for="RandomEvent.Result" class="form-control" value="4" />
+                <span asp-validation-for="RandomEvent.Result" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="RandomEvent.Description" class="control-label"></label>
+                <input asp-for="RandomEvent.Description" class="form-control" />
+                <span asp-validation-for="RandomEvent.Description" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="RandomEvent.RandomItemId" class="control-label"></label>
+                <input asp-for="RandomEvent.RandomItemId" class="form-control" value="1"/>
+                <span asp-validation-for="RandomEvent.RandomItemId" class="text-danger"></span>
+                @* <select asp-for="RandomEvent.RandomItemId" class ="form-control" asp-items="ViewBag.RandomItemId"></select> *@
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Add RandomEvent" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-page="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

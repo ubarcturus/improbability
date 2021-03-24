@@ -15,7 +15,7 @@
             <div class="container">
                 <a class="navbar-brand" asp-area="" asp-page="/Index">Improbability</a>
                 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse"
-                        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
@@ -25,6 +25,9 @@
                         </li>
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-page="/Privacy">Privacy</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-page="/AddRandomEvent">Add RandomEvent</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link text-dark" href="/swagger" target="_blank">Swagger</a>
@@ -56,4 +59,5 @@
 
     @await RenderSectionAsync("Scripts", false)
 </body>
+
 </html>
