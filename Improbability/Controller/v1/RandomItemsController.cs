@@ -17,7 +17,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Improbability.Controller.v1
 {
     /// <summary>
-    ///     A web API that can manage random items stored in a database.
+    /// A web API that can manage random items stored in a database.
     /// </summary>
     [Produces("application/json")]
     [Route("api/v1/[controller]")]
@@ -35,8 +35,7 @@ namespace Improbability.Controller.v1
         /// Get all RandomItems
         /// </summary>
         /// <param name="authorization" example="Key 5RE23H4JHQA2DVLVSEZ525UCRLWXUKGQ">Your API-Key</param>
-        /// <returns>All RandomItems.</returns>
-        /// <response code="200">Return a JSON-Array of RandomItems</response>
+        /// <response code="200">OK: Return an Array of RandomItems</response>
         /// <response code="401">Unauthorized: Your API-Key is wrong or in wrong format</response>
         [HttpGet]
         [ProducesResponseType(typeof(Collection<RandomItem>), StatusCodes.Status200OK)]
@@ -57,12 +56,11 @@ namespace Improbability.Controller.v1
         /// </summary>
         /// <param name="id">The ID of the desired RandomItem</param>
         /// <param name="authorization" example="Key 5RE23H4JHQA2DVLVSEZ525UCRLWXUKGQ">Your API-Key</param>
-        /// <returns>The RandomItem with the id</returns>
-        /// <response code="200">Return the RandomItem with this id</response>
+        /// <response code="200">OK: Return the RandomItem with this id</response>
         /// <response code="401">Unauthorized: Your API-Key is wrong or in wrong format, or you have no permissions for the RandomItem with this id</response>
         /// <response code="404">Not Found: There is no RandomItem with this id</response>
         [HttpGet("{id}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(RandomItem), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesDefaultResponseType]
@@ -78,8 +76,35 @@ namespace Improbability.Controller.v1
             return randomItem ?? (ActionResult<RandomItem>)NotFound();
         }
 
+        /// <summary>
+        /// Update a RandomItem
+        /// </summary>
+        /// <remarks>
+        /// **DANGER: Every missing entry will reset the existing to null or zero!**
+        ///
+        /// Sample request:
+        ///
+        ///     PUT /api/v1/randomitems/1
+        ///     Authorization: Key 5BLBAI3PGNUPVO5GFKMUSSPC6KCAE2M7
+        ///     Content-Type: application/json
+        ///
+        ///     {
+        ///         "id": 1,
+        ///         "name": "W10",
+        ///         "numberOfPossibleResults": 10,
+        ///         "description": "Ten sites"
+        ///     }
+        ///
+        /// </remarks>
+        /// <param name="id">The ID of the desired RandomItem</param>
+        /// <param name="authorization" example="Key 5RE23H4JHQA2DVLVSEZ525UCRLWXUKGQ">Your API-Key</param>
+        /// <param name="randomItem">The new Data for the RandomItem</param>
+        /// <response code="200">OK: Return the new RandomItem</response>
+        /// <response code="400">Bad Request: The id in URL and the RandomItem are different or the RandomItem is in wrong format</response>
+        /// <response code="401">Unauthorized: Your API-Key is wrong or in wrong format, or you have no permissions for the RandomItem with this id</response>
+        /// <response code="404">Not Found: There is no RandomItem with this id</response>
         [HttpPut("{id}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(RandomItem), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -115,7 +140,42 @@ namespace Improbability.Controller.v1
             return Ok(randomItem);
         }
 
+        /// <summary>
+        /// Add some RandomItems
+        /// </summary>
+        /// <remarks>
+        /// **ATTENTION: Don't set an id!**
+        ///
+        /// Sample request:
+        ///
+        ///     POST /api/v1/randomitems/
+        ///     Authorization: Key 5BLBAI3PGNUPVO5GFKMUSSPC6KCAE2M7
+        ///     Content-Type: application/json
+        ///
+        ///     [
+        ///         {
+        ///             "name": "W10",
+        ///             "numberOfPossibleResults": 10,
+        ///             "description": "Ten sites"
+        ///         },
+        ///         {
+        ///             "name": "W6",
+        ///             "numberOfPossibleResults": 6,
+        ///             "description": "Six sites"
+        ///         }
+        ///     ]
+        ///
+        /// </remarks>
+        /// <param name="authorization" example="Key 5RE23H4JHQA2DVLVSEZ525UCRLWXUKGQ">Your API-Key</param>
+        /// <param name="randomItems">An array with your new RandomItems</param>
+        /// <response code="201">Created: Return an array with the new RandomItems</response>
+        /// <response code="400">Bad Request: The array or one RandomItem is in wrong format</response>
+        /// <response code="401">Unauthorized: Your API-Key is wrong or in wrong format</response>
         [HttpPost]
+        [ProducesResponseType(typeof(Collection<RandomItem>), StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesDefaultResponseType]
         public async Task<ActionResult<Collection<RandomItem>>> PostRandomItems([FromHeader] string authorization, Collection<RandomItem> randomItems)
         {
             if (!IsAuthorized(authorization))
@@ -139,8 +199,40 @@ namespace Improbability.Controller.v1
             return CreatedAtAction(nameof(GetRandomItems), randomItems);
         }
 
+        /// <summary>
+        /// Add some RandomItems from csv file
+        /// </summary>
+        /// <remarks>
+        /// **ATTENTION: Don't set an id!**
+        ///
+        /// Sample request:
+        ///
+        ///     POST /api/v1/randomitems/csv
+        ///     Authorization: Key 5BLBAI3PGNUPVO5GFKMUSSPC6KCAE2M7
+        ///     Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+        ///
+        ///     ------WebKitFormBoundary7MA4YWxkTrZu0gW
+        ///     Content-Disposition: form-data; name="csv"; filename="filename.csv"
+        ///     Content-Type: text/csv
+        ///
+        ///     W14,14
+        ///     W10,10,"Ten, sites"
+        ///     W8,8,Eight
+        ///     W6,6,Six sites
+        ///     ------WebKitFormBoundary7MA4YWxkTrZu0gW--
+        ///
+        /// </remarks>
+        /// <param name="authorization" example="Key 5RE23H4JHQA2DVLVSEZ525UCRLWXUKGQ">Your API-Key</param>
+        /// <param name="csv" example="Key 5RE23H4JHQA2DVLVSEZ525UCRLWXUKGQ">The CSV data or file</param>
+        /// <response code="201">Created: Return an array with the new RandomItems</response>
+        /// <response code="400">Bad Request: The array or one RandomItem is in wrong format</response>
+        /// <response code="401">Unauthorized: Your API-Key is wrong or in wrong format</response>
         [HttpPost("csv")]
         [Consumes("multipart/form-data")]
+        [ProducesResponseType(typeof(Collection<RandomItem>), StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesDefaultResponseType]
         public async Task<ActionResult<Collection<RandomItem>>> PostRandomItems([FromHeader] string authorization, IFormFile csv)
         {
             if (!IsAuthorized(authorization))
@@ -188,7 +280,19 @@ namespace Improbability.Controller.v1
             return CreatedAtAction(nameof(GetRandomItems), randomItems);
         }
 
+        /// <summary>
+        /// Remove a RandomItem
+        /// </summary>
+        /// <param name="id">The ID of the desired RandomItem</param>
+        /// <param name="authorization" example="Key 5RE23H4JHQA2DVLVSEZ525UCRLWXUKGQ">Your API-Key</param>
+        /// <response code="204">No Content: RandomItem is deleted</response>
+        /// <response code="401">Unauthorized: Your API-Key is wrong or in wrong format, or you have no permissions for the RandomItem with this id</response>
+        /// <response code="404">Not Found: There is no RandomItem with this id</response>
         [HttpDelete("{id}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesDefaultResponseType]
         public async Task<IActionResult> DeleteRandomItem(int id, [FromHeader] string authorization)
         {
             if (!IsAuthorized(authorization, id))
@@ -209,22 +313,11 @@ namespace Improbability.Controller.v1
             return NoContent();
         }
 
-        /// <summary>
-        ///     Checks if the user is authorized.
-        /// </summary>
-        /// <param name="authorization">The value from authorization key in the header.</param>
-        /// <returns>true, if the validation is successful, otherwise false.</returns>
         private bool IsAuthorized(string authorization)
         {
             return UserIsAuthenticated(authorization, out _);
         }
 
-        /// <summary>
-        ///     Checks if the user is authorized for the id.
-        /// </summary>
-        /// <param name="id">The id from the randomItem</param>
-        /// <param name="authorization">The value from authorization key in the header.</param>
-        /// <returns>true, if the validation is successful, otherwise false.</returns>
         private bool IsAuthorized(string authorization, int id)
         {
             if (!UserIsAuthenticated(authorization, out var applicationUser))
@@ -240,12 +333,6 @@ namespace Improbability.Controller.v1
             return false;
         }
 
-        /// <summary>
-        ///     Checks if the authorization value in the header is valid and if the api-key is assigned to a user.
-        /// </summary>
-        /// <param name="authorization">The value from authorization key in the header.</param>
-        /// <param name="applicationUser">The ApplicationUser or null.</param>
-        /// <returns>true, if the validation is successful, otherwise false.</returns>
         private bool UserIsAuthenticated(string authorization, out ApplicationUser applicationUser)
         {
             applicationUser = null;

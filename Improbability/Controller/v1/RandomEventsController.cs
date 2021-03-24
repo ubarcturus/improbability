@@ -94,12 +94,17 @@ namespace Improbability.Controller.v1
                 return Unauthorized();
             }
 
+            // if (!ModelState.IsValid)
+            // {
+            //     return BadRequest(ModelState);
+            // }
+
             if (!RandomEventExists(id))
             {
                 return NotFound();
             }
 
-            if (randomEvent == null || id != randomEvent.Id)
+            if (randomEvent == null || id != randomEvent.Id || randomEvent.RandomItemId == 0)
             {
                 return BadRequest();
             }
