@@ -1,0 +1,46 @@
+﻿@page
+@model Improbability.Pages.RandomItemDiagramsModel
+
+@{
+    ViewData["Title"] = "Random Item Diagrams";
+}
+
+<h1>RandomItemDiagrams</h1>
+
+<hr/>
+<div class="row">
+    <div class="col-md-4">
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="ApplicationUser.ApiKey" class="control-label"></label>
+                <input asp-for="ApplicationUser.ApiKey" class="form-control apiKey" value="5RE23H4JHQA2DVLVSEZ525UCRLWXUKGQ"/>
+                <span asp-validation-for="ApplicationUser.ApiKey" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="RandomEvent.RandomItemId" class="control-label"></label>
+                <input asp-for="RandomEvent.RandomItemId" class="form-control randomItemId" value="1"/>
+                <span asp-validation-for="RandomEvent.RandomItemId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="button" value="Show RandomEvents charts" class="btn btn-primary show-statistic"/>
+            </div>
+        </form>
+        @Html.AntiForgeryToken()
+    </div>
+</div>
+<div id="histogram_div"></div>
+<div id="scatterChart_div"></div>
+<div>Minimum: <span id="minimum"></span></div>
+<div>Maximum: <span id="maximum"></span></div>
+<div>Average: <span id="average"></span></div>
+
+<div>
+    <a asp-page="Index">Back to Home</a>
+</div>
+
+<script src="https://www.gstatic.com/charts/loader.js"></script>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}

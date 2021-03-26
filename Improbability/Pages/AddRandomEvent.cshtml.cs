@@ -39,8 +39,8 @@ namespace Improbability.Pages
                 return Page();
             }
 
-            var apiUrl = $"/api/v1/randomevents?randomitemid={RandomEvent.RandomItemId}";
-            var requestUri = new Uri($"http://localhost:45347{apiUrl}");
+            var apiUrl = "http://localhost:45347/api/v1/";
+            var requestUri = new Uri($"{apiUrl}randomevents?randomitemid={RandomEvent.RandomItemId}");
             using var httpClient = new HttpClient();
             using var requestContent = new StringContent($"[{JsonConvert.SerializeObject(RandomEvent)}]", Encoding.UTF8, "application/json");
             httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Key", ApplicationUser.ApiKey);
