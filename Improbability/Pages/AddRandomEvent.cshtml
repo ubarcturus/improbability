@@ -6,16 +6,53 @@
 }
 
 <h1>Add RandomEvent</h1>
-
-<h4>RandomEvent</h4>
-<hr />
+<hr/>
 <div class="row">
     <div class="col-md-4">
         @if (Response.StatusCode == 201)
         {
-            <div class="alert alert-success text-center" role="alert">
-                Successful added: <br/>
-                @(Model.RandomEvent)
+            <div class="alert alert-success" role="alert">
+                <h5 class="text-center">Successful added:</h5>
+                <dl class="row">
+                    <dt class="col-sm-2">
+                        @Html.DisplayNameFor(model => model.RandomEvent.Id):
+                    </dt>
+                    <dd class="col-sm-10">
+                        @Html.DisplayFor(model => model.RandomEvent.Id)
+                    </dd>
+                    <dt class="col-sm-2">
+                        @Html.DisplayNameFor(model => model.RandomEvent.Name):
+                    </dt>
+                    <dd class="col-sm-10">
+                        @Html.DisplayFor(model => model.RandomEvent.Name)
+                    </dd>
+                    <dt class="col-sm-2">
+                        @Html.DisplayNameFor(model => model.RandomEvent.Time):
+                    </dt>
+                    <dd class="col-sm-10">
+                        @Html.DisplayFor(model => model.RandomEvent.Time)
+                    </dd>
+                    <dt class="col-sm-2">
+                        @Html.DisplayNameFor(model => model.RandomEvent.Result):
+                    </dt>
+                    <dd class="col-sm-10">
+                        @Html.DisplayFor(model => model.RandomEvent.Result)
+                    </dd>
+                    <dt class="col-sm-2">
+                        @Html.DisplayNameFor(model => model.RandomEvent.Description):
+                    </dt>
+                    <span>
+                        <dd class="col-sm-10">
+                            @Html.DisplayFor(model => model.RandomEvent.Description)
+                        </dd>
+                    </span>
+                    <dt class="col-sm-5">
+                        @Html.DisplayNameFor(model => model.RandomEvent.RandomItemId):
+                    </dt>
+                    <dd class="col-sm-7">
+                        @Html.DisplayFor(model => model.RandomEvent.RandomItemId)
+                    </dd>
+                </dl>
             </div>
         }
         <form method="post">
@@ -27,41 +64,40 @@
             </div>
             <div class="form-group">
                 <label asp-for="RandomEvent.Name" class="control-label"></label>
-                <input asp-for="RandomEvent.Name" class="form-control" />
+                <input asp-for="RandomEvent.Name" class="form-control"/>
                 <span asp-validation-for="RandomEvent.Name" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="RandomEvent.Time" class="control-label"></label>
-                <input asp-for="RandomEvent.Time" class="form-control" type="datetime-local" value="@(DateTime.Now.ToString("s"))" />
+                <input asp-for="RandomEvent.Time" class="form-control" type="datetime-local" value="@(DateTime.Now.ToString("s"))"/>
                 <span asp-validation-for="RandomEvent.Time" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="RandomEvent.Result" class="control-label"></label>
-                <input asp-for="RandomEvent.Result" class="form-control" value="4" />
+                <input asp-for="RandomEvent.Result" class="form-control" value="4"/>
                 <span asp-validation-for="RandomEvent.Result" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="RandomEvent.Description" class="control-label"></label>
-                <input asp-for="RandomEvent.Description" class="form-control" />
+                <textarea asp-for="RandomEvent.Description" class="form-control"></textarea>
                 <span asp-validation-for="RandomEvent.Description" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="RandomEvent.RandomItemId" class="control-label"></label>
                 <input asp-for="RandomEvent.RandomItemId" class="form-control" value="1"/>
                 <span asp-validation-for="RandomEvent.RandomItemId" class="text-danger"></span>
-                @* <select asp-for="RandomEvent.RandomItemId" class ="form-control" asp-items="ViewBag.RandomItemId"></select> *@
             </div>
             <div class="form-group">
-                <input type="submit" value="Add RandomEvent" class="btn btn-primary" />
+                <input type="submit" value="Add RandomEvent" class="btn btn-primary"/>
             </div>
         </form>
     </div>
 </div>
 
 <div>
-    <a asp-page="Index">Back to List</a>
+    <a asp-page="Index">Back to Home</a>
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
 }
