@@ -1,0 +1,34 @@
+{
+  "name": "mega",
+  "version": "1.0.0",
+  "xo": {
+    "env": [
+      "browser",
+      "commonjs",
+      "es2021",
+      "jquery",
+      "mongo",
+      "node",
+      "shared-node-browser",
+      "serviceworker"
+    ],
+    "extends": [],
+    "extensions": [
+      "js"
+    ],
+    "rules": {
+      "unicorn/filename-case": "off"
+    },
+    "prettier": true
+  },
+  "scripts": {
+    "test": "xo"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "html-validate": "^4.7.1",
+    "xo": "^0.38.2"
+  }
+}
