@@ -1,5 +1,4 @@
 ﻿using System;
-using System.ComponentModel.DataAnnotations;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
@@ -8,7 +7,6 @@ using System.Threading.Tasks;
 using Improbability.Data;
 using Improbability.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Improbability.Pages
@@ -37,15 +35,9 @@ namespace Improbability.Pages
             var randomItem = await GetRandomItemAsync(apiUrl, requestBody);
             var randomEvents = await GetRandomEventsAsync(apiUrl, requestBody);
 
-            // var returnBody = (randomItem, randomEvents);
             var returnBody = new FetchReturnBody { RandomItem = randomItem, RandomEvents = randomEvents };
 
             return new JsonResult(returnBody);
-
-            // _context.RandomEvents.Add(RandomEvent);
-            // await _context.SaveChangesAsync();
-
-            // return RedirectToPage("./Index");
         }
 
         private async Task<JsonElement> GetRandomItemAsync(Uri apiUrl, FetchRequestBody requestBody)
