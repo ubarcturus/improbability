@@ -34,9 +34,9 @@ namespace Improbability.Controller.v1
         /// <summary>
         /// Get all RandomItems
         /// </summary>
-        /// <param name="authorization" example="Key 5RE23H4JHQA2DVLVSEZ525UCRLWXUKGQ">Your API-Key</param>
-        /// <response code="200">OK: Return an Array of RandomItems</response>
-        /// <response code="401">Unauthorized: Your API-Key is wrong or in wrong format</response>
+        /// <param name="authorization" example="Key 5RE23H4JHQA2DVLVSEZ525UCRLWXUKGQ">The API-Key</param>
+        /// <response code="200">OK: Return an array of RandomItems</response>
+        /// <response code="401">Unauthorized: Your API-Key is wrong or in the wrong format</response>
         [HttpGet]
         [ProducesResponseType(typeof(Collection<RandomItem>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -52,12 +52,12 @@ namespace Improbability.Controller.v1
         }
 
         /// <summary>
-        /// Get a RandomItem by ID.
+        /// Get a RandomItem by ID
         /// </summary>
         /// <param name="id">The ID of the desired RandomItem</param>
         /// <param name="authorization" example="Key 5RE23H4JHQA2DVLVSEZ525UCRLWXUKGQ">Your API-Key</param>
         /// <response code="200">OK: Return the RandomItem with this id</response>
-        /// <response code="401">Unauthorized: Your API-Key is wrong or in wrong format, or you have no permissions for the RandomItem with this id</response>
+        /// <response code="401">Unauthorized: Your API-Key is wrong or in the wrong format, or you have no permissions for the RandomItem with this id</response>
         /// <response code="404">Not Found: There is no RandomItem with this id</response>
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(RandomItem), StatusCodes.Status200OK)]
@@ -80,28 +80,28 @@ namespace Improbability.Controller.v1
         /// Update a RandomItem
         /// </summary>
         /// <remarks>
-        /// **DANGER: Every missing entry will reset the existing to null or zero!**
-        ///
+        /// **DANGER: Every missing argument will reset the existing value to null or zero!**
+        /// 
         /// Sample request:
-        ///
+        /// 
         ///     PUT /api/v1/randomitems/1
         ///     Authorization: Key 5BLBAI3PGNUPVO5GFKMUSSPC6KCAE2M7
         ///     Content-Type: application/json
-        ///
+        /// 
         ///     {
         ///         "id": 1,
         ///         "name": "W10",
         ///         "numberOfPossibleResults": 10,
         ///         "description": "Ten sites"
         ///     }
-        ///
+        /// 
         /// </remarks>
         /// <param name="id">The ID of the desired RandomItem</param>
         /// <param name="authorization" example="Key 5RE23H4JHQA2DVLVSEZ525UCRLWXUKGQ">Your API-Key</param>
         /// <param name="randomItem">The new Data for the RandomItem</param>
         /// <response code="200">OK: Return the new RandomItem</response>
-        /// <response code="400">Bad Request: The id in URL and the RandomItem are different or the RandomItem is in wrong format</response>
-        /// <response code="401">Unauthorized: Your API-Key is wrong or in wrong format, or you have no permissions for the RandomItem with this id</response>
+        /// <response code="400">Bad Request: The id in URL and the RandomItem are different or the RandomItem is in the wrong format</response>
+        /// <response code="401">Unauthorized: Your API-Key is wrong or in the wrong format, or you have no permissions for the RandomItem with this id</response>
         /// <response code="404">Not Found: There is no RandomItem with this id</response>
         [HttpPut("{id}")]
         [ProducesResponseType(typeof(RandomItem), StatusCodes.Status200OK)]
@@ -144,14 +144,14 @@ namespace Improbability.Controller.v1
         /// Add some RandomItems
         /// </summary>
         /// <remarks>
-        /// **ATTENTION: Don't set an id!**
-        ///
+        /// **ATTENTION: Don't set an id!** An id is always automatically generated. If you do, the Request will fail.
+        /// 
         /// Sample request:
-        ///
+        /// 
         ///     POST /api/v1/randomitems/
         ///     Authorization: Key 5BLBAI3PGNUPVO5GFKMUSSPC6KCAE2M7
         ///     Content-Type: application/json
-        ///
+        /// 
         ///     [
         ///         {
         ///             "name": "W10",
@@ -164,13 +164,13 @@ namespace Improbability.Controller.v1
         ///             "description": "Six sites"
         ///         }
         ///     ]
-        ///
+        /// 
         /// </remarks>
         /// <param name="authorization" example="Key 5RE23H4JHQA2DVLVSEZ525UCRLWXUKGQ">Your API-Key</param>
-        /// <param name="randomItems">An array with your new RandomItems</param>
+        /// <param name="randomItems">An array with the new RandomItems</param>
         /// <response code="201">Created: Return an array with the new RandomItems</response>
-        /// <response code="400">Bad Request: The array or one RandomItem is in wrong format</response>
-        /// <response code="401">Unauthorized: Your API-Key is wrong or in wrong format</response>
+        /// <response code="400">Bad Request: The array or one RandomItem is in the wrong format</response>
+        /// <response code="401">Unauthorized: Your API-Key is wrong or in the wrong format</response>
         [HttpPost]
         [ProducesResponseType(typeof(Collection<RandomItem>), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -203,30 +203,30 @@ namespace Improbability.Controller.v1
         /// Add some RandomItems from csv file
         /// </summary>
         /// <remarks>
-        /// **ATTENTION: Don't set an id!**
-        ///
+        /// **ATTENTION: Don't set an id!** An id is always automatically generated. If you do, the Request will fail.
+        /// 
         /// Sample request:
-        ///
+        /// 
         ///     POST /api/v1/randomitems/csv
         ///     Authorization: Key 5BLBAI3PGNUPVO5GFKMUSSPC6KCAE2M7
         ///     Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
-        ///
+        /// 
         ///     ------WebKitFormBoundary7MA4YWxkTrZu0gW
         ///     Content-Disposition: form-data; name="csv"; filename="filename.csv"
         ///     Content-Type: text/csv
-        ///
+        /// 
         ///     W14,14
-        ///     W10,10,"Ten, sites"
+        ///     W10,10,"Ten, sides"
         ///     W8,8,Eight
-        ///     W6,6,Six sites
+        ///     W6,6,Six sides
         ///     ------WebKitFormBoundary7MA4YWxkTrZu0gW--
-        ///
+        /// 
         /// </remarks>
         /// <param name="authorization" example="Key 5RE23H4JHQA2DVLVSEZ525UCRLWXUKGQ">Your API-Key</param>
         /// <param name="csv" example="Key 5RE23H4JHQA2DVLVSEZ525UCRLWXUKGQ">The CSV data or file</param>
         /// <response code="201">Created: Return an array with the new RandomItems</response>
-        /// <response code="400">Bad Request: The array or one RandomItem is in wrong format</response>
-        /// <response code="401">Unauthorized: Your API-Key is wrong or in wrong format</response>
+        /// <response code="400">Bad Request: The CSV file is missing or in the wrong format</response>
+        /// <response code="401">Unauthorized: Your API-Key is wrong or in the wrong format</response>
         [HttpPost("csv")]
         [Consumes("multipart/form-data")]
         [ProducesResponseType(typeof(Collection<RandomItem>), StatusCodes.Status201Created)]
@@ -283,7 +283,7 @@ namespace Improbability.Controller.v1
         /// <summary>
         /// Remove a RandomItem
         /// </summary>
-        /// <param name="id">The ID of the desired RandomItem</param>
+        /// <param name="id">The id of the desired RandomItem</param>
         /// <param name="authorization" example="Key 5RE23H4JHQA2DVLVSEZ525UCRLWXUKGQ">Your API-Key</param>
         /// <response code="204">No Content: RandomItem is deleted</response>
         /// <response code="401">Unauthorized: Your API-Key is wrong or in wrong format, or you have no permissions for the RandomItem with this id</response>
