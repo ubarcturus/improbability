@@ -1,11 +1,12 @@
 @startuml Sequence
+skinparam shadowing false
 
-Benutzer -> Browser: Klick: Show Diagram
-Browser -> Browser: Read inputs
-Browser -> API: fetch GET URL
-API -> RandomItem: GetRandomEvents(...)
-RandomItem -> Database: SELECT * FROM RandomEvents ...
-
+Benutzer -> Browser: Click: Show statistics
+Browser -> Browser: Read Form
+Browser -> Server: HTTP Request <URL>
+Server -> RandomEvent: GetRandomEvents(...)
+RandomEvent -> Database: SELECT * FROM RandomEvents ...
+Server --> Browser: HTTP Response
 Browser -> Browser: Draw Diagram
 
 @enduml

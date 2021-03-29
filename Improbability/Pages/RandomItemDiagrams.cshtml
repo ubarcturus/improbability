@@ -2,10 +2,10 @@
 @model Improbability.Pages.RandomItemDiagramsModel
 
 @{
-    ViewData["Title"] = "Random Item Diagrams";
+    ViewData["Title"] = "RandomEvent Statistics";
 }
 
-<h1>RandomItemDiagrams</h1>
+<h1>RandomEvent Statistics</h1>
 
 <hr/>
 <div class="row">
@@ -27,7 +27,7 @@
                 <span asp-validation-for="RandomEvent.RandomItemId" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <input id="show-statistic" type="button" value="Show RandomEvents charts" class="btn btn-primary"/>
+                <input id="show-statistic" type="button" value="Show statistics" class="btn btn-primary"/>
             </div>
         </form>
         @Html.AntiForgeryToken()
