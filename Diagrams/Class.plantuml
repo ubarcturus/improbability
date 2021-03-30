@@ -58,5 +58,4 @@ RandomItemDiagramsModel -up-> ApplicationUser
 RandomItemDiagramsModel *-right- RequestBody
 AddRandomEventModel --> RandomEvent
 AddRandomEventModel --> ApplicationUser
-
 @enduml

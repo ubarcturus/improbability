@@ -216,7 +216,7 @@ namespace Improbability.Controller.v1
         ///             "result": 8,
         ///             "description": "is optional",
         ///             "randomItemId": 2
-        ///         },
+        ///         }
         ///     ]
         ///
         /// </remarks>

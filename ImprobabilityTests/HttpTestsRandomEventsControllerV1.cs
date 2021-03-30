@@ -239,6 +239,39 @@ namespace ImprobabilityTests
             Assert.Equal(HttpStatusCode.BadRequest, httpStatusCode);
         }
 
+        [Fact]
+        public void AddEventsFromCsv()
+        {
+            const string first = "First,2021-03-23T15:23:12.0857267+01:00,3,Description,1";
+            const string second = ",2021-03-23T14:00:22+01:00,6,,1";
+            const string third = "Third,2021-03-23T14:00:22+01:00,2,\"Something, else \",1";
+            const string name = "csv";
+            const string fileName = "test.csv";
+            var data = $"{first}\n{second}\n{third}";
+            var (httpStatusCode, _) = HttpPostCsv("?randomItemId=1", KeyUbarcturus, name, fileName, data);
+            Assert.Equal(HttpStatusCode.Created, httpStatusCode);
+        }
+
+        [Fact]
+        public void AddEmptyCsv()
+        {
+            const string name = "csv";
+            const string fileName = "test.csv";
+            const string data = "";
+            var (httpStatusCode, _) = HttpPostCsv("?randomItemId=1", KeyUbarcturus, name, fileName, data);
+            Assert.Equal(HttpStatusCode.BadRequest, httpStatusCode);
+        }
+
+        [Fact]
+        public void AddNotConformCsv()
+        {
+            const string name = "csv";
+            const string fileName = "test.csv";
+            const string data = "NotConform";
+            var (httpStatusCode, _) = HttpPostCsv("?randomItemId=1", KeyUbarcturus, name, fileName, data);
+            Assert.Equal(HttpStatusCode.BadRequest, httpStatusCode);
+        }
+
         #endregion POST
 
         #region DELETE
@@ -254,6 +287,13 @@ namespace ImprobabilityTests
                 .ToString();
             var (httpStatusCode, _) = HttpDelete(randomEventId, KeyUbarcturus);
             Assert.Equal(HttpStatusCode.NoContent, httpStatusCode);
+        }
+
+        [Fact]
+        public void DeleteItemWithIdWhichNotExists()
+        {
+            var (httpStatusCode, _) = HttpDelete("2147483647", KeyUbarcturus);
+            Assert.Equal(HttpStatusCode.NotFound, httpStatusCode);
         }
 
         #endregion DELETE
