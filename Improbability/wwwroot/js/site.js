@@ -4,12 +4,16 @@
 
 // Write your JavaScript code.
 
+'use strict';
+
 const showStatisticButton = document.querySelector('#show-statistic');
 showStatisticButton.addEventListener('click', showStatistic);
 
 async function showStatistic() {
 	const [apiKey, randomItemId, token] = readInputs();
 	const randomEvents = await getRandomEvents(apiKey, randomItemId, token);
+	console.log(calcChiSquared(randomEvents));
+	console.log(calcChiSquaredBiased(randomEvents, 950));
 	drawHistogram(randomEvents);
 	drawScatterChart(randomEvents);
 	calcStatistics(randomEvents);
@@ -155,3 +159,76 @@ function calcStdDev(randomEvents) {
 	);
 	return Math.sqrt(sum / randomEvents.randomEvents.length);
 }
+
+/*
+https://en.wikipedia.org/wiki/Pearson%27s_chi-squared_test
+*/
+function calcChiSquared(randomEvents) {
+	const numberOfPossibleResults =
+		randomEvents.randomItem.numberOfPossibleResults;
+	const histogram = {};
+	for (let i = 1; i <= numberOfPossibleResults; i++) {
+		histogram[i] = 0;
+	}
+
+	for (const randomEvent of randomEvents.randomEvents) {
+		histogram[randomEvent.result] += 1;
+	}
+
+	let sum = 0;
+	const expected = randomEvents.randomEvents.length / numberOfPossibleResults;
+	for (let i = 1; i <= numberOfPossibleResults; i++) {
+		sum += (histogram[i] - expected) ** 2 / expected;
+	}
+
+	return sum;
+}
+
+function calcChiSquaredDegreeOfFreedom(randomEvents) {
+	const numberOfPossibleResults =
+		randomEvents.randomItem.numberOfPossibleResults;
+	return numberOfPossibleResults - 1;
+}
+
+const chiSquaredDistribution = {
+	900: [],
+	950: [3.84, 5.99, 7.81, 9.49, 11.1, 12.6, 14.1],
+	990: [],
+	995: [],
+	// TODO continue list
+};
+
+/*
+True = random events may be biased
+false = no answer possible
+*/
+function calcChiSquaredBiased(randomEvents, significance) {
+	const chiSquared = calcChiSquared(randomEvents);
+	const degreeOfFreedom = calcChiSquaredDegreeOfFreedom(randomEvents);
+	return chiSquared > chiSquaredDistribution[significance][degreeOfFreedom - 1];
+}
+
+/*
+Old
+const bodyResults = [ 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6 ];
+const body = { randomEvents: bodyResults.map(($) => ({ result: $ })) };
+
+const randomEvents = {
+	randomItem: {
+		id: 0,
+		name: '',
+		numberOfPossibleResults: 0,
+		description: '',
+	},
+	randomEvents: [
+		{
+			id: 0,
+			name: '',
+			time: '',
+			result: 0,
+			description: '',
+			randomItemId: 0,
+		},
+	],
+};
+*/

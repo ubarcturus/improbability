@@ -1,0 +1,124 @@
+@keyUbarcturus = 5RE23H4JHQA2DVLVSEZ525UCRLWXUKGQ
+@keyPhilipp = ZTVWQSDYXSF2UB6B46LKSIGA7GVWHZAQ
+@url = /api/v1/randomevents
+@port = 45347
+@host = localhost:{{port}}
+@randomItemIdParameter = randomItemId=
+@randomItemId = 1
+@event1 = "name": "One {{$guid}}", "time": "{{$localDatetime iso8601}}", "result": {{$randomInt 0 20}}, "description": "Test {{$timestamp}}"
+@event2 = "name": "Two {{$guid}}", "time": "{{$localDatetime iso8601}}", "result": {{$randomInt 0 20}}, "description": "Test {{$timestamp}}"
+@event3 = "name": "Three {{$guid}}", "time": "{{$localDatetime iso8601}}", "result": {{$randomInt 0 20}}, "description": "Test {{$timestamp}}"
+
+###
+
+GET {{url}} HTTP/1.1
+Host: {{host}}
+Authorization: Key {{keyUbarcturus}}
+# Authorization: Key {{keyPhilipp}}
+
+###
+
+GET {{url}}?{{randomItemIdParameter}}1 HTTP/1.1
+Host: {{host}}
+Authorization: Key {{keyUbarcturus}}
+# Authorization: Key {{keyPhilipp}}
+
+###
+
+GET {{url}}/1 HTTP/1.1
+Host: {{host}}
+Authorization: Key {{keyUbarcturus}}
+# Authorization: Key {{keyPhilipp}}
+
+###
+
+// To big ID
+GET {{url}}/2147483648 HTTP/1.1
+Host: {{host}}
+Authorization: Key {{keyUbarcturus}}
+
+###
+
+// ID as string
+GET {{url}}/abc HTTP/1.1
+Host: {{host}}
+Authorization: Key {{keyUbarcturus}}
+
+###
+
+@id = 18
+PUT {{url}}/{{id}} HTTP/1.1
+Host: {{host}}
+Authorization: Key {{keyUbarcturus}}
+# Authorization: Key {{keyPhilipp}}
+Content-Type: application/json
+
+{
+	"id": {{id}},
+	{{event1}},
+	"randomItemId": {{randomItemId}}
+}
+
+###
+
+POST {{url}}?{{randomItemIdParameter}}{{randomItemId}} HTTP/1.1
+Host: {{host}}
+Authorization: Key {{keyUbarcturus}}
+# Authorization: Key {{keyPhilipp}}
+Content-Type: application/json
+
+[
+	{
+		{{event1}},
+		"randomItemId": {{randomItemId}}
+	}
+]
+
+###
+
+POST {{url}}?{{randomItemIdParameter}}{{randomItemId}} HTTP/1.1
+Host: {{host}}
+Authorization: Key {{keyUbarcturus}}
+# Authorization: Key {{keyPhilipp}}
+Content-Type: application/json
+
+[
+	{
+		{{event1}},
+		"randomItemId": {{randomItemId}}
+	},
+	{
+		{{event2}},
+		"randomItemId": {{randomItemId}}
+	},
+	{
+		{{event3}},
+		"randomItemId": {{randomItemId}}
+	}
+]
+
+###
+
+POST {{url}}/csv?{{randomItemIdParameter}}{{randomItemId}} HTTP/1.1
+Host: {{host}}
+Authorization: Key {{keyUbarcturus}}
+# Authorization: Key {{keyPhilipp}}
+Content-Type: multipart/form-data; boundary=--------------------------527686229256579488542897
+
+----------------------------527686229256579488542897
+Content-Disposition: form-data; name="csv"; filename="test.csv"
+Content-Type: text/csv
+
+First,2021-03-23T15:23:12.0857267+01:00,3,Description,1
+,2021-03-23T14:00:22+01:00,6,,1
+Third,2021-03-23T14:00:22+01:00,2,"Something, else",1
+----------------------------527686229256579488542897--
+
+###
+
+DELETE {{url}}/102 HTTP/1.1
+Host: {{host}}
+Authorization: Key {{keyUbarcturus}}
+# Authorization: Key {{keyPhilipp}}
+
+###

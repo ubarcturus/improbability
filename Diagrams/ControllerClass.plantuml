@@ -1,0 +1,36 @@
+@startuml Controller Class Diagram
+left to right direction
+skinparam shadowing false
+
+class RandomEventsController {
+    + RandomEventsController(context:ApplicationDbContext)
+    + <<async>> GetRandomEvents(randomItemId:string, authorization:string) : Task<ActionResult<IEnumerable<RandomEvent>>>
+    + <<async>> GetRandomEvent(id:int, authorization:string) : Task<ActionResult<RandomEvent>>
+    + <<async>> PutRandomEvent(id:int, authorization:string, randomEvent:RandomEvent) : Task<ActionResult<RandomEvent>>
+    + <<async>> PostRandomEvents(randomItemId:string, authorization:string, randomEvents:Collection<RandomEvent>) : Task<ActionResult<Collection<RandomEvent>>>
+    + <<async>> PostRandomEvents(randomItemId:string, authorization:string, csv:IFormFile) : Task<ActionResult<Collection<RandomEvent>>>
+    + <<async>> DeleteRandomEvent(id:int, authorization:string) : Task<IActionResult>
+    - IsAuthenticated(authorization:string) : bool
+    - AccessIsAllowed(id:int, authorization:string) : bool
+    - AccessIsAllowed(randomItemIdString:string, authorization:string) : bool
+    - <<async>> GetRandomEventsFromUserAsync(authorization:string) : Task<List<RandomEvent>>
+    - RandomEventExists(id:int) : bool
+    - IsInteger(randomItemId:string, itemId:int) : bool
+    - <<async>> GetApplicationUserAsync(apiKey:string) : Task<ApplicationUser>
+}
+
+class RandomItemsController {
+    + RandomItemsController(context:ApplicationDbContext)
+    + <<async>> GetRandomItems(authorization:string) : Task<ActionResult<IEnumerable<RandomItem>>>
+    + <<async>> GetRandomItem(id:int, authorization:string) : Task<ActionResult<RandomItem>>
+    + <<async>> PutRandomItem(id:int, authorization:string, randomItem:RandomItem) : Task<ActionResult<RandomItem>>
+    + <<async>> PostRandomItems(authorization:string, randomItems:Collection<RandomItem>) : Task<ActionResult<Collection<RandomItem>>>
+    + <<async>> PostRandomItems(authorization:string, csv:IFormFile) : Task<ActionResult<Collection<RandomItem>>>
+    + <<async>> DeleteRandomItem(id:int, authorization:string) : Task<IActionResult>
+    - IsAuthorized(authorization:string) : bool
+    - IsAuthorized(authorization:string, id:int) : bool
+    - UserIsAuthenticated(authorization:string, applicationUser:ApplicationUser) : bool
+    - <<async>> GetRandomItemsFromUserAsync(authorization:string) : Task<Collection<RandomItem>>
+    - RandomItemExists(id:int) : bool
+}
+@enduml

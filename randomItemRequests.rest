@@ -1,0 +1,115 @@
+@keyUbarcturus = 5RE23H4JHQA2DVLVSEZ525UCRLWXUKGQ
+@keyPhilipp = ZTVWQSDYXSF2UB6B46LKSIGA7GVWHZAQ
+@url = /api/v1/randomitems
+@port = 45347
+@host = localhost:{{port}}
+@w2 = "name": "W2", "numberOfPossibleResults": 2, "description": "ZweiSeiten"
+@w4 = "name": "W4", "numberOfPossibleResults": 4, "description": "VierSeiten"
+@w6 = "name": "W6", "numberOfPossibleResults": 6, "description": "SechsSeiten"
+@w8 = "name": "W8", "numberOfPossibleResults": 8, "description": "AchtSeiten"
+@w10 = "name": "W10", "numberOfPossibleResults": 10, "description": "ZehnSeiten"
+@w20 = "name": "W20", "numberOfPossibleResults": 20, "description": "ZwanzigSeiten"
+
+###
+
+GET {{url}} HTTP/1.1
+Host: {{host}}
+Authorization: Key {{keyUbarcturus}}
+# Authorization: Key {{keyPhilipp}}
+
+###
+
+GET {{url}}/1 HTTP/1.1
+Host: {{host}}
+Authorization: Key {{keyUbarcturus}}
+# Authorization: Key {{keyPhilipp}}
+
+###
+
+// To big ID
+GET {{url}}/2147483648 HTTP/1.1
+Host: {{host}}
+Authorization: Key {{keyUbarcturus}}
+
+###
+
+// ID as string
+GET {{url}}/abc HTTP/1.1
+Host: {{host}}
+Authorization: Key {{keyUbarcturus}}
+
+###
+
+@id = 2
+PUT {{url}}/{{id}} HTTP/1.1
+Host: {{host}}
+Authorization: Key {{keyUbarcturus}}
+# Authorization: Key {{keyPhilipp}}
+Content-Type: application/json
+
+{
+	"id": {{id}},
+	{{w4}}
+}
+
+###
+
+POST {{url}} HTTP/1.1
+Host: {{host}}
+Authorization: Key {{keyUbarcturus}}
+# Authorization: Key {{keyPhilipp}}
+Content-Type: application/json
+
+[
+	{
+		{{w10}}
+	}
+]
+
+###
+
+POST {{url}} HTTP/1.1
+Host: {{host}}
+Authorization: Key {{keyUbarcturus}}
+# Authorization: Key {{keyPhilipp}}
+Content-Type: application/json
+
+[
+	{
+		{{w4}}
+	},
+	{
+		{{w6}}
+	},
+	{
+		{{w20}}
+	}
+]
+
+###
+
+POST {{url}}/csv HTTP/1.1
+Host: {{host}}
+Authorization: Key {{keyUbarcturus}}
+# Authorization: Key {{keyPhilipp}}
+Content-Type: multipart/form-data; boundary=--------------------------527686229256579488542897
+
+----------------------------527686229256579488542897
+Content-Disposition: form-data; name="csv"; filename="test.csv"
+Content-Type: text/csv
+
+W14,14
+W12,12,
+W10,10,"Zehn,Seiten"
+W8,8,Acht,
+W6,6,SechsSeiten
+----------------------------527686229256579488542897--
+
+###
+
+DELETE {{url}}/351 HTTP/1.1
+Host: {{host}}
+Authorization: Key {{keyUbarcturus}}
+# Authorization: Key {{keyPhilipp}}
+
+###
